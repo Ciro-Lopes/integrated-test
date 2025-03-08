@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   # Port for application
+      - "15672:15672" # Por for visual control panel
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  ts-app:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - INGESTION_QUEUE_NAME=ingestion.person
+      - FILL_AGE_QUEUE_NAME=fill.age.person
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_NAME=mydb
+    volumes:
+      - ./node:/app
+    working_dir: /app
+    command: npx ts-node src/main.ts
+
+volumes:
+  rabbitmq_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+
+

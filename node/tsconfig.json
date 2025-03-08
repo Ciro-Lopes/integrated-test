@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                  // Define a versão do ECMAScript (ajuste conforme necessário)
+    "module": "CommonJS",                // Usa CommonJS como sistema de módulos
+    "outDir": "./dist",                  // Saída do código compilado
+    "rootDir": "./src",                  // Diretório de origem dos arquivos TypeScript
+    "esModuleInterop": true,             // Permite importar módulos CommonJS com `import`
+    "strict": true,                      // Habilita todas as verificações de tipo
+    "skipLibCheck": true,                // Ignora checagem de bibliotecas externas (melhora a performance)
+    "forceConsistentCasingInFileNames": true,  // Garante que o case dos arquivos seja consistente
+    "resolveJsonModule": true,           // Permite importar arquivos JSON como módulos
+    "moduleResolution": "node",          // Usa o comportamento de resolução de módulos do Node.js
+    "allowSyntheticDefaultImports": true, // Permite importação de módulos sem export default
+    "sourceMap": true,                   // Gera arquivos .map para depuração
+    "declaration": true,                 // Gera arquivos .d.ts para cada módulo
+    "skipDefaultLibCheck": true          // Ignora checagem das bibliotecas padrão (melhora a performance)
+  },
+  "include": [
+    "src/**/*.ts"                        // Inclui todos os arquivos TypeScript no diretório src
+  ],
+  "exclude": [
+    "node_modules"                       // Exclui a pasta node_modules
+  ]
+}
