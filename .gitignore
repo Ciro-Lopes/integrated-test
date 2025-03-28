@@ -27,6 +27,7 @@ obj/
 secrets.json
 *.log
 logs/
+.vs
 .vscode/
 .idea/
 
