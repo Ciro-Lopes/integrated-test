@@ -27,10 +27,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
   
-  ts-app:
+  node-app:
     build:
       context: ./node
       dockerfile: Dockerfile
+    container_name: node-app
     depends_on:
       - rabbitmq
       - postgres
@@ -47,6 +48,15 @@ services:
       - ./node:/app
     working_dir: /app
     command: npx ts-node src/main.ts
+
+  app-dotnet:
+    build:
+      context: ./dotnet
+      dockerfile: Dockerfile
+    container_name: dotnet-app
+    depends_on:
+      - rabbitmq
+      - postgres
 
 volumes:
   rabbitmq_data:

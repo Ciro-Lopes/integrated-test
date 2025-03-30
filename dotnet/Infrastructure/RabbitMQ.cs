@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System;
+using System.Text;
 using dotnet.Services;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -11,12 +13,9 @@ namespace dotnet.Infrastructure
         private IConnection? _connection;
         private IChannel? _channel;
         private string _queueName;
-        private IPersonService _personService;
 
         public RabbitMQ(IConfiguration configuration, PersonService personService)  
         {
-            _personService = personService;
-
             _factoryConnection = new ConnectionFactory
             {
                 HostName = configuration["RabbitMQ:Host"]!,
@@ -29,9 +28,30 @@ namespace dotnet.Infrastructure
 
         public async Task Init()
         {
-            _connection = await _factoryConnection.CreateConnectionAsync();
-            _channel = await _connection.CreateChannelAsync();
-            await _channel.QueueDeclareAsync(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            int retries = 5;
+            while (retries > 0)
+            {
+                try
+                {
+                    _connection = await _factoryConnection.CreateConnectionAsync();
+                    _channel = await _connection.CreateChannelAsync();
+                    await _channel.QueueDeclareAsync(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                    Console.WriteLine($"🎯 Queue '${_queueName}' created with success.");
+
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error -> {ex.Message}");
+                    Console.WriteLine($"❌ Error to connect on RabbitMQ, trying again... (${ retries} remaining attempts)");
+                    retries--;
+
+                    Thread.Sleep(5000); // Wait 5s before trying again
+                }
+            }
+
+            Console.WriteLine("❌ Unable to connect to RabbitMQ.");
+            Environment.Exit(0);
         }
 
         public async Task ConsumeAsync(Func<string, Task> processMessageAsync, CancellationToken stoppingToken)
@@ -44,7 +64,7 @@ namespace dotnet.Infrastructure
 
                 try
                 {
-                    await _personService.ProcessMessage(message);
+                    await processMessageAsync(message);
                     await _channel!.BasicAckAsync(ea.DeliveryTag, false);
                 }
                 catch (Exception ex)

@@ -1,6 +1,6 @@
 ﻿namespace dotnet.Services
 {
-    public class PersonService : IPersonService
+    public class PersonService
     {
         public PersonService() { }
 
@@ -8,6 +8,7 @@
         {
             // Calcula idade
             // Salva na base
+            Console.WriteLine(message);
 
             return Task.CompletedTask;
         }

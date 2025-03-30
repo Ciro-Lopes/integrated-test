@@ -1,24 +1,22 @@
+using dotnet.Services;
+
 namespace dotnet
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly Infrastructure.RabbitMQ _rabbitmq;
+        private PersonService _personService;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(Infrastructure.RabbitMQ rabbitmq, PersonService personService)
         {
-            _logger = logger;
+            _rabbitmq = rabbitmq;
+            _personService = personService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                if (_logger.IsEnabled(LogLevel.Information))
-                {
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                }
-                await Task.Delay(1000, stoppingToken);
-            }
+            await _rabbitmq.Init();
+            await _rabbitmq.ConsumeAsync(_personService.ProcessMessage, stoppingToken);
         }
     }
 }
