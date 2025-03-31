@@ -22,6 +22,6 @@ export class PersonService {
 
     const createdPerson = await this.repository.insert(person);
 
-    await rabbit.publish(JSON.stringify(createdPerson), this.fillAgeQueue, {})
+    await rabbit.publish(JSON.stringify(createdPerson.id), this.fillAgeQueue, {})
   }
 }

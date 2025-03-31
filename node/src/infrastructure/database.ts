@@ -17,7 +17,7 @@ export class Database {
       });
 
       Database.instance.on('connect', () => {
-        console.log('🔌 Connected to PostgreSQL');
+        console.log('Connected to PostgreSQL');
       });
       
       Database.instance.on('error', (err) => {

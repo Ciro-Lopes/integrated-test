@@ -23,18 +23,18 @@ export class RabbitMQ {
         this.channel = await this.connection.createChannel();
 
         await this.channel.assertQueue(this.queue, { durable: true });
-        console.log(`🎯 Queue '${this.queue}' created with success.`);
+        console.log(`Queue '${this.queue}' created with success.`);
         
         return;
       } catch (error) {
-        console.error(`❌ Error to connect on RabbitMQ, trying again... (${retries} remaining attempts)`);
+        console.error(`Error to connect on RabbitMQ, trying again... (${retries} remaining attempts)`);
         retries--;
         
         await new Promise((res) => setTimeout(res, 5000)); // Wait 5s before trying again
       }
     }
 
-    console.error("❌ Unable to connect to RabbitMQ.");
+    console.error("Unable to connect to RabbitMQ.");
     process.exit(1);
   }
 
@@ -45,7 +45,7 @@ export class RabbitMQ {
     }
 
     this.channel.sendToQueue(queue, Buffer.from(message), { persistent: true, ...options });
-    console.log(`📤 Posted message: ${message}`);
+    console.log(`Posted message: ${message}`);
   }
 
   // Creates a consumer that processes messages with the callback function
@@ -60,20 +60,20 @@ export class RabbitMQ {
           await callback(message);
           this.channel.ack(message);
         } catch (err) {
-          console.error("❌ Error processing message:", err);
+          console.error("Error processing message:", err);
           
           this.channel.nack(message, false, false);
         }
       }
     });
 
-    console.log("🔄 Waiting for messages...");
+    console.log("Waiting for messages...");
   }
 
   // Closes the connection and the channel
   public async close(): Promise<void> {
     await this.channel.close();
     await this.connection.close();
-    console.log("🔒 Connection to RabbitMQ closed.");
+    console.log("Connection to RabbitMQ closed.");
   }
 }

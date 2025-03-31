@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System;
-using System.Text;
+﻿using System.Text;
 using dotnet.Services;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -26,7 +24,7 @@ namespace dotnet.Infrastructure
             _queueName = configuration["RabbitMQ:QueueName"]!;
         }
 
-        public async Task Init()
+        public async Task InitAsync()
         {
             int retries = 5;
             while (retries > 0)
@@ -36,21 +34,21 @@ namespace dotnet.Infrastructure
                     _connection = await _factoryConnection.CreateConnectionAsync();
                     _channel = await _connection.CreateChannelAsync();
                     await _channel.QueueDeclareAsync(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                    Console.WriteLine($"🎯 Queue '${_queueName}' created with success.");
+                    Console.WriteLine($"Queue '{_queueName}' created with success.");
 
                     return;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error -> {ex.Message}");
-                    Console.WriteLine($"❌ Error to connect on RabbitMQ, trying again... (${ retries} remaining attempts)");
+                    Console.WriteLine($"Error to connect on RabbitMQ, trying again... (${ retries} remaining attempts)");
                     retries--;
 
                     Thread.Sleep(5000); // Wait 5s before trying again
                 }
             }
 
-            Console.WriteLine("❌ Unable to connect to RabbitMQ.");
+            Console.WriteLine("Unable to connect to RabbitMQ.");
             Environment.Exit(0);
         }
 

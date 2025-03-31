@@ -15,8 +15,8 @@ namespace dotnet
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _rabbitmq.Init();
-            await _rabbitmq.ConsumeAsync(_personService.ProcessMessage, stoppingToken);
+            await _rabbitmq.InitAsync();
+            await _rabbitmq.ConsumeAsync(_personService.ProcessMessageAsync, stoppingToken);
         }
     }
 }

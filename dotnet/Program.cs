@@ -1,4 +1,5 @@
 using dotnet;
+using dotnet.Repositories;
 using dotnet.Services;
 
 var host = Host.CreateDefaultBuilder(args)
@@ -11,6 +12,7 @@ var host = Host.CreateDefaultBuilder(args)
     {
         services.AddSingleton<dotnet.Infrastructure.RabbitMQ>();
         services.AddSingleton<PersonService>();
+        services.AddSingleton<PersonRepository>();
         services.AddHostedService<Worker>();
     })
     .Build();
