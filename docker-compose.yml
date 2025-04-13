@@ -49,12 +49,23 @@ services:
     working_dir: /app
     command: npx ts-node src/main.ts
 
-  app-dotnet:
+  dotnet-app:
     build:
       context: ./dotnet
       dockerfile: Dockerfile
     container_name: dotnet-app
     depends_on:
+      - rabbitmq
+      - postgres
+  
+  python-app:
+    build:
+      context: ./python
+    ports:
+      - "8000:8000"
+    depends_on:
+      - node-app
+      - dotnet-app
       - rabbitmq
       - postgres
 
